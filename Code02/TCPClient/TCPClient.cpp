@@ -1,6 +1,8 @@
+// 출처: IT CookBook, TCP/IP 윈도우 소켓 프로그래밍
 #pragma comment(lib, "ws2_32")
 #include <winsock2.h>
 #include <Ws2tcpip.h>
+
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -42,12 +44,17 @@ int recvn(SOCKET s, char *buf, int len, int flags)
 	char *ptr = buf;
 	int left = len;
 
-	while(left > 0){
+	while(left > 0)
+	{
 		received = recv(s, ptr, left, flags);
-		if(received == SOCKET_ERROR)
+		
+		if (received == SOCKET_ERROR) {
 			return SOCKET_ERROR;
-		else if(received == 0)
+		} 
+		else if (received == 0) {
 			break;
+		}
+
 		left -= received;
 		ptr += received;
 	}
@@ -61,20 +68,20 @@ int main(int argc, char *argv[])
 
 	// 윈속 초기화
 	WSADATA wsa;
-	if(WSAStartup(MAKEWORD(2,2), &wsa) != 0)
+	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0) {
 		return 1;
+	}
 
 	// socket()
 	SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
-	if(sock == INVALID_SOCKET) err_quit("socket()");
+	if (sock == INVALID_SOCKET) {
+		err_quit("socket()");
+	}
 
 	// connect()
 	SOCKADDR_IN serveraddr;
 	ZeroMemory(&serveraddr, sizeof(serveraddr));
-	serveraddr.sin_family = AF_INET;
-	//serveraddr.sin_addr.s_addr = inet_addr(SERVERIP);
-	//serveraddr.sin_port = htons(SERVERPORT);
-
+	serveraddr.sin_family = AF_INET;	
 	auto ret = inet_pton(AF_INET, SERVERIP, (void *)&serveraddr.sin_addr.s_addr);
 	serveraddr.sin_port = htons(SERVERPORT);
 
@@ -88,7 +95,8 @@ int main(int argc, char *argv[])
 	int len;
 
 	// 서버와 데이터 통신
-	while(1){
+	while(1)
+	{
 		// 데이터 입력
 		printf("\n[보낼 데이터] ");
 		if(fgets(buf, BUFSIZE+1, stdin) == NULL)

@@ -1,3 +1,5 @@
+// 출처: IT CookBook, TCP/IP 윈도우 소켓 프로그래밍
+
 #pragma comment(lib, "ws2_32")
 #include <winsock2.h>
 #include <Ws2tcpip.h>
@@ -34,12 +36,15 @@ int main(int argc, char *argv[])
 
 	// 윈속 초기화
 	WSADATA wsa;
-	if(WSAStartup(MAKEWORD(2,2), &wsa) != 0)
+	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0) {
 		return 1;
+	}
 
 	// socket()
 	SOCKET listen_sock = socket(AF_INET, SOCK_STREAM, 0);
-	if(listen_sock == INVALID_SOCKET) err_quit("socket()");
+	if (listen_sock == INVALID_SOCKET) {
+		err_quit("socket()");
+	}
 
 	// bind()
 	SOCKADDR_IN serveraddr;
@@ -48,16 +53,22 @@ int main(int argc, char *argv[])
 	serveraddr.sin_addr.s_addr = htonl(INADDR_ANY);
 	serveraddr.sin_port = htons(SERVERPORT);
 	retval = bind(listen_sock, (SOCKADDR *)&serveraddr, sizeof(serveraddr));
-	if(retval == SOCKET_ERROR) err_quit("bind()");
+	if (retval == SOCKET_ERROR) {
+		err_quit("bind()");
+	}
 
 	// listen()
 	retval = listen(listen_sock, SOMAXCONN);
-	if(retval == SOCKET_ERROR) err_quit("listen()");
+	if (retval == SOCKET_ERROR) {
+		err_quit("listen()");
+	}
 
 	// 넌블로킹 소켓으로 전환
-	u_long on = 1;
+	/*u_long on = 1;
 	retval = ioctlsocket(listen_sock, FIONBIO, &on);
-	if(retval == SOCKET_ERROR) err_display("ioctlsocket()");
+	if (retval == SOCKET_ERROR) {
+		err_display("ioctlsocket()");
+	}*/
 
 	// 데이터 통신에 사용할 변수
 	FD_SET rset, wset;
@@ -116,6 +127,7 @@ int main(int argc, char *argv[])
 			{
 				// 데이터 받기
 				retval = recv(ptr->sock, ptr->buf, BUFSIZE, 0);
+
 				if(retval == SOCKET_ERROR) {
 					err_display("recv()");
 					RemoveSocketInfo(i);
